@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { View, Text, ImageBackground, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import AsyncStorage from '@react-native-community/async-storage'
+import axios from 'axios'
 
 import todayImage from '../assets/imgs/today.jpg'
 import commonStyles from '../commonStyles'
@@ -27,8 +28,8 @@ export default class TaskList extends Component {
 
     componentDidMount = async () => {
         const stateString = await AsyncStorage.getItem('tasksState')
-        const state = JSON.parse(stateString) || initialState
-        this.setState(state, this.filterTasks)
+        const savedState = JSON.parse(stateString) || initialState
+        this.setState({ showDoneTasks: savedState.showDoneTasks }, this.filterTasks)
     }
 
     toggleTask = taskId => {
@@ -55,7 +56,7 @@ export default class TaskList extends Component {
         }
 
         this.setState({ visibleTasks })
-        AsyncStorage.setItem('tasksState', JSON.stringify(this.state))
+        AsyncStorage.setItem('tasksState', JSON.stringify({showDoneTasks: this.state.showDoneTasks}))
     }
 
 

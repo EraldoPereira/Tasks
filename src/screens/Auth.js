@@ -1,47 +1,79 @@
 import React, { Component } from 'react'
 import { ImageBackground, StyleSheet, Text, View, TextInput, TouchableOpacity, Alert } from 'react-native'
+import axios from 'axios'
 
 import backgroundImage from '../assets/imgs/login.jpg'
 import AuthInput from '../components/AuthInput'
 
+import { server, showError, showSuccess } from '../common'
+
+const initialState = {
+    nome: '',
+    email: 'cleiton@gmail.com',
+    senha: '123456789',
+    confirmaSenha: '',
+    stageNew: false
+}
+
 export default class Auth extends Component {
 
 
-    state = {
-        nome: '', 
-        email: '',
-        senha: '',
-        confirmaSenha: '',
-        stageNew: false
-    }
+    state = { ...initialState }
 
 
     signinOrSignup = () => {
-        if(this.state.stageNew){
-            Alert.alert('Sucesso!','Criar Conta')
-        }else{
-            Alert.alert('Sucesso!', 'Logar')
+        if (this.state.stageNew) {
+            this.signup()
+        } else {
+            this.signin()
         }
     }
 
-    render(){
+    signup = async () => {
+        try {
+            await axios.post(`${server}/user/cadastro`, {
+                nome: this.state.nome,
+                email: this.state.email,
+                senha: this.state.senha
+            })
+            showSuccess('Usuário cadastrado!')
+            this.setState({ ...initialState })
+        } catch (error) {
+            showError(error)
+        }
+    }
+
+    signin = async () => {
+        try {
+            const res = await axios.post(`${server}/login`, {
+                email: this.state.email,
+                senha: this.state.senha
+            })
+            axios.defaults.headers.common['Authorization'] = `bearer ${res.data.token}`
+            this.props.navigation.navigate('Home')
+        } catch (error) {
+            showError("Erro ao fazer login")
+        }
+    }
+
+    render() {
         return (
             <ImageBackground source={backgroundImage} style={styles.background} >
                 <Text style={styles.title} >Tasks</Text>
                 <View style={styles.formContainer} >
-                    <Text style={styles.subtittle} >{this.state.stageNew ? 'Crie sua conta': 'Informe seus dados'}</Text>
-                    {this.state.stageNew && <AuthInput icon='user' placeholder="Nome" value={this.state.nome} style={styles.input} onChangeText={ nome => this.setState({ nome }) } /> }
-                    <AuthInput icon='at' placeholder="E-mail" value={this.state.email} style={styles.input} onChangeText={ email => this.setState({ email }) } />
-                    <AuthInput icon='lock' placeholder="Senha" value={this.state.senha} style={styles.input} onChangeText={ senha => this.setState({ senha }) } secureTextEntry={true} />
-                    {this.state.stageNew && <AuthInput icon='asterisk' placeholder="Confirma Senha" value={this.state.confirmaSenha} style={styles.input} onChangeText={ confirmaSenha => this.setState({ confirmaSenha }) } /> }
+                    <Text style={styles.subtittle} >{this.state.stageNew ? 'Crie sua conta' : 'Informe seus dados'}</Text>
+                    {this.state.stageNew && <AuthInput icon='user' placeholder="Nome" value={this.state.nome} style={styles.input} onChangeText={nome => this.setState({ nome })} />}
+                    <AuthInput icon='at' placeholder="E-mail" value={this.state.email} style={styles.input} onChangeText={email => this.setState({ email })} />
+                    <AuthInput icon='lock' placeholder="Senha" value={this.state.senha} style={styles.input} onChangeText={senha => this.setState({ senha })} secureTextEntry={true} />
+                    {this.state.stageNew && <AuthInput icon='asterisk' placeholder="Confirma Senha" value={this.state.confirmaSenha} style={styles.input} onChangeText={confirmaSenha => this.setState({ confirmaSenha })} secureTextEntry={true} />}
                     <TouchableOpacity onPress={this.signinOrSignup} >
                         <View style={styles.button} >
                             <Text style={styles.buttonText} >{this.state.stageNew ? 'Registrar' : 'Entrar'}</Text>
                         </View>
                     </TouchableOpacity>
                 </View>
-                <TouchableOpacity style={{ padding: 10 }} onPress={ () => { this.setState({ stageNew: !this.state.stageNew }) } } > 
-                    <Text style={styles.buttonText} >{ this.state.stageNew ? 'Já possui conta?' : 'Ainda não possui conta?' }</Text>
+                <TouchableOpacity style={{ padding: 10 }} onPress={() => { this.setState({ stageNew: !this.state.stageNew }) }} >
+                    <Text style={styles.buttonText} >{this.state.stageNew ? 'Já possui conta?' : 'Ainda não possui conta?'}</Text>
                 </TouchableOpacity>
             </ImageBackground>
         )
@@ -50,35 +82,35 @@ export default class Auth extends Component {
 }
 
 const styles = StyleSheet.create({
-    title:{
+    title: {
         fontFamily: 'Montserrat-Regular',
-        color:'#FFF',
+        color: '#FFF',
         fontSize: 70,
         marginBottom: 10
     },
-    subtittle:{
+    subtittle: {
         fontFamily: 'Montserrat-Regular',
         color: '#FFF',
         fontSize: 20,
         textAlign: 'center',
         marginBottom: 10
     },
-    background:{
+    background: {
         flex: 1,
         width: '100%',
-        alignItems:'center',
+        alignItems: 'center',
         justifyContent: 'center',
     },
-    input:{
+    input: {
         marginTop: 10,
         backgroundColor: '#FFF',
     },
-    formContainer:{
+    formContainer: {
         backgroundColor: 'rgba(0, 0, 0, 0.8)',
         padding: 20,
         width: '90%'
     },
-    button:{
+    button: {
         backgroundColor: '#080',
         marginTop: 10,
         padding: 10,
