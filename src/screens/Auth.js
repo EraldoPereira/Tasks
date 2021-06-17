@@ -57,6 +57,19 @@ export default class Auth extends Component {
     }
 
     render() {
+
+        //Validar formulario
+        const validations = []
+        validations.push( this.state.email && this.state.email.includes('@') )
+        validations.push( this.state.senha && this.state.senha.length >= 6 )
+        
+        if(this.state.stageNew){
+            validations.push( this.state.nome && this.state.nome.trim().length >= 3 )
+            validations.push( this.state.senha === this.state.confirmaSenha )
+        }
+        const validForm = validations.reduce( (t, a) => t && a )
+
+
         return (
             <ImageBackground source={backgroundImage} style={styles.background} >
                 <Text style={styles.title} >Tasks</Text>
@@ -66,8 +79,8 @@ export default class Auth extends Component {
                     <AuthInput icon='at' placeholder="E-mail" value={this.state.email} style={styles.input} onChangeText={email => this.setState({ email })} />
                     <AuthInput icon='lock' placeholder="Senha" value={this.state.senha} style={styles.input} onChangeText={senha => this.setState({ senha })} secureTextEntry={true} />
                     {this.state.stageNew && <AuthInput icon='asterisk' placeholder="Confirma Senha" value={this.state.confirmaSenha} style={styles.input} onChangeText={confirmaSenha => this.setState({ confirmaSenha })} secureTextEntry={true} />}
-                    <TouchableOpacity onPress={this.signinOrSignup} >
-                        <View style={styles.button} >
+                    <TouchableOpacity onPress={this.signinOrSignup} disabled={!validForm} >
+                        <View style={ [styles.button, validForm ? {} : { backgroundColor: '#AAA' }] } >
                             <Text style={styles.buttonText} >{this.state.stageNew ? 'Registrar' : 'Entrar'}</Text>
                         </View>
                     </TouchableOpacity>
