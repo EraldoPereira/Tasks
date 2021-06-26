@@ -10,13 +10,13 @@ import commonStyles from '../commonStyles'
 
 export default props => {
 
-    const doneOrNotStyle = props.doneAt != null ? { textDecorationLine: 'line-through' } : {}
-    const date = props.doneAt ? props.doneAt : props.estimateAt
+    const doneOrNotStyle = props.status ? { textDecorationLine: 'line-through' } : {}
+    const date = props.data_concluida ? props.data_concluida : props.data_estimada
     const formatedDate = moment(date).locale('pt-br').format('ddd, D [de] MMMM')
 
     const getRightContent = () => {
         return (
-            <TouchableOpacity style={styles.right} onPress={ () => props.onDelete && props.onDelete(props.id) } >
+            <TouchableOpacity style={styles.right} onPress={ () => props.onDelete && props.onDelete(props.id_task) } >
                 <Icon name="trash" size={30} color="#FFF" />
             </TouchableOpacity>
         )
@@ -32,15 +32,15 @@ export default props => {
     }
 
     return (
-        <Swipeable renderRightActions={getRightContent} renderLeftActions={getLeftContent} onSwipeableLeftOpen={ () => props.onDelete && props.onDelete(props.id) } >
+        <Swipeable renderRightActions={getRightContent} renderLeftActions={getLeftContent} onSwipeableLeftOpen={ () => props.onDelete && props.onDelete(props.id_task) } >
             <View style={styles.container} >
-                <TouchableWithoutFeedback onPress={() => props.toggleTask(props.id)} >
+                <TouchableWithoutFeedback onPress={() => props.toggleTask(props.id_task)} >
                     <View style={styles.checkContainer} >
-                        {getCheckView(props.doneAt)}
+                        {getCheckView(props.status)}
                     </View>
                 </TouchableWithoutFeedback>
                 <View>
-                    <Text style={[styles.desc, doneOrNotStyle]}  >{props.desc}</Text>
+                    <Text style={[styles.desc, doneOrNotStyle]}  >{props.descricao}</Text>
                     <Text style={styles.date} >{formatedDate}</Text>
                 </View>
             </View>
@@ -48,8 +48,8 @@ export default props => {
     )
 }
 
-function getCheckView(doneAt) {
-    if (doneAt != null) {
+function getCheckView(status) {
+    if (status) {
         return (
             <View style={styles.done} >
                 <Icon name="check" size={20} color="#fff" ></Icon>

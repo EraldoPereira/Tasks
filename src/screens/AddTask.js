@@ -6,7 +6,7 @@ import commonStyles from '../commonStyles'
 
 import moment from 'moment'
 
-const initialState = { desc: '', date: new Date(), showDatePicker: false }
+const initialState = { descricao: '', data_estimada: new Date(), showDatePicker: false, status: false }
 
 export default class AddTask extends Component {
 
@@ -16,8 +16,9 @@ export default class AddTask extends Component {
 
     save = () => {
         const newTask = {
-            desc: this.state.desc,
-            date: this.state.date
+            descricao: this.state.descricao,
+            data_estimada: this.state.data_estimada,
+            status: false
         }
         if(this.props.onSave){
             this.props.onSave(newTask)
@@ -26,8 +27,8 @@ export default class AddTask extends Component {
     }
 
     getDatePicker = () => {
-        let datePicker = <DateTimePicker value={this.state.date} onChange={(_, date) => this.setState({ date: date, showDatePicker: false })} mode='date' />
-        const dateString = moment(this.state.date).format('dddd, D [de] MMMM')
+        let datePicker = <DateTimePicker value={this.state.data_estimada} onChange={(_, date) => this.setState({ data_estimada: date, showDatePicker: false })} mode='date' />
+        const dateString = moment(this.state.data_estimada).format('dddd, D [de] MMMM')
         datePicker = (
             <View>
                 <TouchableOpacity onPress={ ()=> this.setState({ showDatePicker: true }) } >
@@ -51,7 +52,7 @@ export default class AddTask extends Component {
                 </TouchableWithoutFeedback>
                 <View style={styles.container} >
                     <Text style={styles.header}>Nova Tarefa</Text>
-                    <TextInput style={styles.input} placeholder="Informe a descrição..." value={this.state.desc} onChangeText={desc => this.setState({ desc })}></TextInput>
+                    <TextInput style={styles.input} placeholder="Informe a descrição..." value={this.state.descricao} onChangeText={descricao => this.setState({ descricao })}></TextInput>
                     {this.getDatePicker()}
                     <View style={styles.buttons} >
                         <TouchableOpacity onPress={this.props.onCancel} >
